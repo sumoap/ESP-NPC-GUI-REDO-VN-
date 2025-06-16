@@ -1,195 +1,240 @@
--- Redo VN ESP - NPC | FIXED FULL NPC LIST v1.09-F
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
-local CoreGui = game:GetService("CoreGui")
+--[[
+    ✅ Redo VN - ESP NPC 🇻🇳
+    ✅ Made by @Redovn-Y8c / V1.13
+    ✅ https://www.youtube.com/@RedoVn-y8c
+--]]
 
-local gui = Instance.new("ScreenGui", CoreGui)
+local Players = game:GetService("Players")
+local RS = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LP = Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui", LP:WaitForChild("PlayerGui"))
 gui.Name = "RedoVN_ESP_GUI"
 gui.ResetOnSpawn = false
 
 -- Toggle Button
-local toggle = Instance.new("TextButton", gui)
-toggle.Size = UDim2.new(0, 160, 0, 40)
-toggle.Position = UDim2.new(0.02, 0, 0.1, 0)
-toggle.Text = "👁️ Redo VN ESP - NPC 🇻🇳"
-toggle.TextSize = 16
-toggle.TextColor3 = Color3.new(1,1,1)
-toggle.BackgroundColor3 = Color3.fromRGB(30,30,30)
-toggle.Font = Enum.Font.GothamBold
-toggle.Draggable = true
-toggle.Active = true
+local toggleBtn = Instance.new("TextButton", gui)
+toggleBtn.Size = UDim2.new(0, 90, 0, 30)
+toggleBtn.Position = UDim2.new(0, 10, 0, 100)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+toggleBtn.Text = "👁️ Toggle ESP"
+toggleBtn.TextColor3 = Color3.new(1, 1, 1)
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextSize = 13
+toggleBtn.Draggable = true
+toggleBtn.Active = true
 
 -- Main Frame
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 320, 0, 440)
-frame.Position = UDim2.new(0.02, 0, 0.2, 0)
-frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
-frame.Visible = true
-frame.Active = true
-frame.Draggable = true
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Size = UDim2.new(0, 280, 0, 420)
+mainFrame.Position = UDim2.new(0, 10, 0, 140)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.Visible = false
+mainFrame.Active = true
+mainFrame.Draggable = true
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 6)
 
 -- Title
-local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Text = "🇻🇳 Redo VN ESP - NPC"
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+title.Text = "Redo VN - ESP NPC 🇻🇳"
 title.Font = Enum.Font.GothamBold
+title.TextSize = 14
 title.TextColor3 = Color3.new(1,1,1)
-title.BackgroundTransparency = 1
-title.TextSize = 18
+
+-- YouTube Link Button
+local linkBtn = Instance.new("TextButton", mainFrame)
+linkBtn.Size = UDim2.new(1, -20, 0, 25)
+linkBtn.Position = UDim2.new(0, 10, 0, 35)
+linkBtn.Text = "🧷 YouTube: RedoVN"
+linkBtn.Font = Enum.Font.GothamSemibold
+linkBtn.TextSize = 13
+linkBtn.TextColor3 = Color3.new(1,1,1)
+linkBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Instance.new("UICorner", linkBtn)
+
+linkBtn.MouseButton1Click:Connect(function()
+    setclipboard("https://www.youtube.com/@RedoVn-y8c")
+end)
 
 -- Credit
-local credit = Instance.new("TextLabel", frame)
+local credit = Instance.new("TextLabel", mainFrame)
 credit.Size = UDim2.new(1, 0, 0, 20)
-credit.Position = UDim2.new(0, 0, 0, 40)
-credit.Text = "📌 Made by @RedoVn-y8c | V1.79 update coming soon"
-credit.Font = Enum.Font.Gotham
-credit.TextColor3 = Color3.fromRGB(255,255,0)
+credit.Position = UDim2.new(0, 0, 0, 65)
 credit.BackgroundTransparency = 1
-credit.TextSize = 14
+credit.Text = "Made by @Redovn-Y8c / V1.13"
+credit.Font = Enum.Font.Gotham
+credit.TextSize = 12
+credit.TextColor3 = Color3.fromRGB(180,180,180)
 
--- Search Box
-local searchBox = Instance.new("TextBox", frame)
-searchBox.PlaceholderText = "🔍 Search NPC..."
-searchBox.Size = UDim2.new(1, -20, 0, 30)
-searchBox.Position = UDim2.new(0, 10, 0, 70)
-searchBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-searchBox.TextColor3 = Color3.new(1, 1, 1)
-searchBox.TextSize = 14
-searchBox.ClearTextOnFocus = false
-searchBox.Font = Enum.Font.Gotham
-
--- Scroll
-local scroll = Instance.new("ScrollingFrame", frame)
-scroll.Size = UDim2.new(1, -20, 1, -120)
-scroll.Position = UDim2.new(0, 10, 0, 110)
-scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-scroll.BackgroundColor3 = Color3.fromRGB(25,25,25)
+-- Scrollable list
+local scroll = Instance.new("ScrollingFrame", mainFrame)
+scroll.Size = UDim2.new(1, -10, 0, 260)
+scroll.Position = UDim2.new(0, 5, 0, 90)
+scroll.BackgroundTransparency = 1
 scroll.ScrollBarThickness = 4
 scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 scroll.ClipsDescendants = true
 
-local listLayout = Instance.new("UIListLayout", scroll)
-listLayout.Padding = UDim.new(0, 5)
-listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+local layout = Instance.new("UIListLayout", scroll)
+layout.Padding = UDim.new(0, 4)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
 
--- Rainbow
-local espColor = Color3.new(0,1,0)
-task.spawn(function()
-	while true do
-		local h = tick() % 5 / 5
-		espColor = Color3.fromHSV(h, 1, 1)
-		wait(0.1)
-	end
+-- Search Box
+local searchBox = Instance.new("TextBox", mainFrame)
+searchBox.Size = UDim2.new(1, -20, 0, 25)
+searchBox.Position = UDim2.new(0, 10, 1, -35)
+searchBox.PlaceholderText = "🔍 Search NPC name"
+searchBox.Font = Enum.Font.Gotham
+searchBox.TextSize = 13
+searchBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+searchBox.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", searchBox)
+
+-- Toggle GUI visibility
+toggleBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = not mainFrame.Visible
 end)
 
-local espList = {}
-local notified = {}
-
-function createESP(npc)
-	if espList[npc] then return end
-	local adornee = npc:FindFirstChild("Head") or npc:FindFirstChildWhichIsA("BasePart")
-	if not adornee then return end
-
-	local billboard = Instance.new("BillboardGui", npc)
-	billboard.Name = "ESP_"..npc.Name
-	billboard.Adornee = adornee
-	billboard.Size = UDim2.new(0, 200, 0, 30)
-	billboard.StudsOffset = Vector3.new(0, 3, 0)
-	billboard.AlwaysOnTop = true
-
-	local label = Instance.new("TextLabel", billboard)
-	label.Size = UDim2.new(1, 0, 1, 0)
-	label.BackgroundTransparency = 1
-	label.Text = "- " .. npc.Name
-	label.Font = Enum.Font.GothamBold
-	label.TextSize = 14
-	label.TextStrokeTransparency = 0.6
-	label.TextColor3 = espColor
-
-	espList[npc] = billboard
+-- Rainbow Color
+local rainbow = 0
+local function getRainbowColor()
+    rainbow = rainbow + 0.01
+    return Color3.fromHSV(rainbow % 1, 1, 1)
 end
 
-function removeESP(npc)
-	if espList[npc] then
-		espList[npc]:Destroy()
-		espList[npc] = nil
-	end
+local espTargets = {}
+
+-- Create Toggle Button for NPC
+local function createToggle(name, model)
+    local data = {Enabled = false, Model = model, Line = nil}
+    espTargets[name] = data
+
+    local button = Instance.new("TextButton", scroll)
+    button.Size = UDim2.new(1, -10, 0, 30)
+    button.Text = "[OFF] " .. name
+    button.TextColor3 = Color3.new(1,1,1)
+    button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 13
+    button.TextXAlignment = Enum.TextXAlignment.Left
+    Instance.new("UICorner", button)
+
+    button.MouseButton1Click:Connect(function()
+        data.Enabled = not data.Enabled
+        button.Text = (data.Enabled and "[ON] " or "[OFF] ") .. name
+    end)
 end
 
--- Load NPCs to List
-function refreshNPCList()
-	scroll:ClearAllChildren()
-	listLayout.Parent = scroll
-
-	for _, model in ipairs(workspace:GetDescendants()) do
-		if model:IsA("Model") and model:FindFirstChildOfClass("Humanoid") and model ~= LocalPlayer.Character then
-			local button = Instance.new("TextButton", scroll)
-			button.Size = UDim2.new(1, 0, 0, 30)
-			button.Text = model.Name
-			button.TextColor3 = Color3.new(1,1,1)
-			button.Font = Enum.Font.Gotham
-			button.TextSize = 14
-			button.BackgroundColor3 = Color3.fromRGB(50,50,50)
-
-			button.MouseButton1Click:Connect(function()
-				if espList[model] then
-					removeESP(model)
-					button.BackgroundColor3 = Color3.fromRGB(50,50,50)
-				else
-					createESP(model)
-					button.BackgroundColor3 = espColor
-				end
-			end)
-		end
-	end
-end
-
--- Search
+-- Filter NPC via search
 searchBox:GetPropertyChangedSignal("Text"):Connect(function()
-	local keyword = searchBox.Text:lower()
-	for _, item in pairs(scroll:GetChildren()) do
-		if item:IsA("TextButton") then
-			item.Visible = item.Text:lower():find(keyword) ~= nil
-		end
-	end
+    local keyword = searchBox.Text:lower()
+    for _, btn in ipairs(scroll:GetChildren()) do
+        if btn:IsA("TextButton") then
+            btn.Visible = keyword == "" or btn.Text:lower():find(keyword)
+        end
+    end
 end)
 
--- Proximity Alert
-RunService.RenderStepped:Connect(function()
-	for npc, gui in pairs(espList) do
-		if npc and npc:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-			local dist = (npc.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-			if dist >= 30 and dist <= 125 and not notified[npc] then
-				notified[npc] = true
-				local msg = Instance.new("TextLabel", gui)
-				msg.Size = UDim2.new(0.4, 0, 0, 30)
-				msg.Position = UDim2.new(0.3, 0, 0, 0)
-				msg.Text = "📢 " .. npc.Name .. " gần bạn! ("..math.floor(dist).." studs)"
-				msg.Font = Enum.Font.GothamBold
-				msg.TextSize = 14
-				msg.TextColor3 = Color3.new(1,1,1)
-				msg.BackgroundColor3 = Color3.fromRGB(0,0,0)
-				wait(3)
-				msg:Destroy()
-			end
-		end
-	end
-end)
+-- Auto detect all valid NPCs
+local function detectNPCs()
+    for _, npc in pairs(workspace:GetDescendants()) do
+        if npc:IsA("Model") and npc:FindFirstChild("Humanoid") and npc:FindFirstChild("HumanoidRootPart") then
+            if not espTargets[npc.Name] then
+                createToggle(npc.Name, npc)
+            end
+        end
+    end
+end
 
--- Tự động refresh danh sách mỗi 1 giây
-task.spawn(function()
-	while true do
-		refreshNPCList()
-		wait(1)
-	end
-end)
+detectNPCs()
 
--- Toggle GUI
-toggle.MouseButton1Click:Connect(function()
-	frame.Visible = not frame.Visible
-end)
+-- Create ESP visuals
+local function createESP(model, data)
+    local billboard = Instance.new("BillboardGui")
+    billboard.Adornee = model:FindFirstChild("HumanoidRootPart")
+    billboard.Size = UDim2.new(0, 200, 0, 50)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Name = "ESP_TAG"
+    billboard.Parent = gui
 
--- Load lần đầu
-refreshNPCList()
+    local nameText = Instance.new("TextLabel", billboard)
+    nameText.Size = UDim2.new(1, 0, 0.5, 0)
+    nameText.BackgroundTransparency = 1
+    nameText.Text = model.Name
+    nameText.Font = Enum.Font.GothamBold
+    nameText.TextStrokeTransparency = 0.4
+    nameText.TextSize = 14
+    nameText.TextColor3 = Color3.new(1,1,1)
+
+    local studText = Instance.new("TextLabel", billboard)
+    studText.Position = UDim2.new(0, 0, 0.5, 0)
+    studText.Size = UDim2.new(1, 0, 0.5, 0)
+    studText.BackgroundTransparency = 1
+    studText.Font = Enum.Font.Gotham
+    studText.TextSize = 12
+    studText.TextColor3 = Color3.fromRGB(180,180,180)
+
+    local line = Drawing.new("Line")
+    line.Thickness = 1.5
+    line.Transparency = 0.8
+    line.Color = Color3.new(1, 1, 1)
+    data.Line = line
+
+    local conn
+    conn = RS.RenderStepped:Connect(function()
+        if not model or not model:FindFirstChild("HumanoidRootPart") then conn:Disconnect() return end
+        if not data.Enabled then billboard:Destroy() line.Visible = false conn:Disconnect() return end
+
+        local char = LP.Character
+        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+
+        local npcHRP = model:FindFirstChild("HumanoidRootPart")
+        local playerHRP = char:FindFirstChild("HumanoidRootPart")
+
+        nameText.Text = model.Name
+        nameText.TextColor3 = getRainbowColor()
+
+        local dist = (playerHRP.Position - npcHRP.Position).Magnitude
+        studText.Text = string.format("%.0f Studs", dist)
+
+        local npcPos, npcOnScreen = Camera:WorldToViewportPoint(npcHRP.Position)
+        local playerPos, playerOnScreen = Camera:WorldToViewportPoint(playerHRP.Position)
+
+        if npcOnScreen then
+            billboard.Enabled = true
+            line.From = playerOnScreen and Vector2.new(playerPos.X, playerPos.Y) or Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
+            line.To = Vector2.new(npcPos.X, npcPos.Y)
+            line.Color = getRainbowColor()
+            line.Visible = true
+        else
+            billboard.Enabled = false
+            line.Visible = false
+        end
+    end)
+end
+
+-- Main ESP loop
+RS.RenderStepped:Connect(function()
+    for name, data in pairs(espTargets) do
+        local model = data.Model
+        if data.Enabled then
+            if not gui:FindFirstChild("ESP_TAG") then
+                createESP(model, data)
+            end
+        else
+            for _, v in ipairs(gui:GetChildren()) do
+                if v:IsA("BillboardGui") and v.Adornee == model:FindFirstChild("HumanoidRootPart") then
+                    v:Destroy()
+                end
+            end
+            if typeof(data.Line) == "table" and data.Line.Remove then
+                pcall(function() data.Line:Remove() end)
+            end
+        end
+    end
+end)
