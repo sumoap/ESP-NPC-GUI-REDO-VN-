@@ -1,4 +1,4 @@
--- ✅ Redo VN - ESP NPC V1.12 (Fix nhiều ESP, hỗ trợ mọi NPC) 🇻🇳
+-- ✅ Redo VN - ESP NPC V1.13 (Full Auto Detect NPC Types) 🇻🇳
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
@@ -8,6 +8,7 @@ local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 gui.Name = "RedoVN_ESP_GUI"
 gui.ResetOnSpawn = false
 
+-- Button toggle
 local toggleBtn = Instance.new("TextButton", gui)
 toggleBtn.Size = UDim2.new(0, 90, 0, 30)
 toggleBtn.Position = UDim2.new(0, 10, 0, 100)
@@ -31,7 +32,7 @@ Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 6)
 local title = Instance.new("TextLabel", mainFrame)
 title.Size = UDim2.new(1, 0, 0, 30)
 title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-title.Text = "Redo VN - ESP NPC 🇻🇳"
+title.Text = "Redo VN - ESP NPC 🇻🇳 - Made by @RedoVn-y8c"
 title.Font = Enum.Font.GothamBold
 title.TextSize = 14
 title.TextColor3 = Color3.new(1,1,1)
@@ -48,141 +49,141 @@ local layout = Instance.new("UIListLayout", scroll)
 layout.Padding = UDim.new(0, 4)
 
 toggleBtn.MouseButton1Click:Connect(function()
-	mainFrame.Visible = not mainFrame.Visible
+    mainFrame.Visible = not mainFrame.Visible
 end)
 
 local rainbow = 0
 local function getRainbowColor()
-	rainbow += 0.01
-	return Color3.fromHSV(rainbow % 1, 1, 1)
+    rainbow += 0.01
+    return Color3.fromHSV(rainbow % 1, 1, 1)
 end
 
 local espTargets = {}
 
 local function createESP(model, data)
-	local hrp = model:FindFirstChild("HumanoidRootPart") or model:FindFirstChildWhichIsA("BasePart")
-	if not hrp then return end
-	if data.Gui then return end
+    local hrp = model:FindFirstChild("HumanoidRootPart") or model:FindFirstChildWhichIsA("BasePart")
+    if not hrp then return end
+    if data.Gui then return end
 
-	local billboard = Instance.new("BillboardGui")
-	billboard.Name = "ESP_TAG"
-	billboard.Adornee = hrp
-	billboard.Size = UDim2.new(0, 200, 0, 50)
-	billboard.StudsOffset = Vector3.new(0, 3, 0)
-	billboard.AlwaysOnTop = true
-	billboard.Parent = gui
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "ESP_TAG"
+    billboard.Adornee = hrp
+    billboard.Size = UDim2.new(0, 200, 0, 50)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = gui
 
-	local nameText = Instance.new("TextLabel", billboard)
-	nameText.Size = UDim2.new(1, 0, 0.5, 0)
-	nameText.BackgroundTransparency = 1
-	nameText.Text = model.Name
-	nameText.Font = Enum.Font.GothamBold
-	nameText.TextStrokeTransparency = 0.4
-	nameText.TextSize = 14
-	nameText.TextColor3 = Color3.new(1,1,1)
+    local nameText = Instance.new("TextLabel", billboard)
+    nameText.Size = UDim2.new(1, 0, 0.5, 0)
+    nameText.BackgroundTransparency = 1
+    nameText.Text = model.Name
+    nameText.Font = Enum.Font.GothamBold
+    nameText.TextStrokeTransparency = 0.4
+    nameText.TextSize = 14
+    nameText.TextColor3 = Color3.new(1,1,1)
 
-	local distText = Instance.new("TextLabel", billboard)
-	distText.Position = UDim2.new(0, 0, 0.5, 0)
-	distText.Size = UDim2.new(1, 0, 0.5, 0)
-	distText.BackgroundTransparency = 1
-	distText.Font = Enum.Font.Gotham
-	distText.TextSize = 12
-	distText.TextColor3 = Color3.fromRGB(180,180,180)
+    local distText = Instance.new("TextLabel", billboard)
+    distText.Position = UDim2.new(0, 0, 0.5, 0)
+    distText.Size = UDim2.new(1, 0, 0.5, 0)
+    distText.BackgroundTransparency = 1
+    distText.Font = Enum.Font.Gotham
+    distText.TextSize = 12
+    distText.TextColor3 = Color3.fromRGB(180,180,180)
 
-	local line = Drawing.new("Line")
-	line.Thickness = 1.5
-	line.Transparency = 0.8
-	line.Color = Color3.new(1, 1, 1)
+    local line = Drawing.new("Line")
+    line.Thickness = 1.5
+    line.Transparency = 0.8
+    line.Color = Color3.new(1, 1, 1)
 
-	data.Line = line
-	data.Gui = billboard
+    data.Line = line
+    data.Gui = billboard
 
-	local conn
-	conn = RunService.RenderStepped:Connect(function()
-		if not model or not model.Parent or not data.Enabled then
-			conn:Disconnect()
-			if line then line.Visible = false line:Remove() end
-			if billboard then billboard:Destroy() end
-			data.Line = nil
-			data.Gui = nil
-			return
-		end
+    local conn
+    conn = RunService.RenderStepped:Connect(function()
+        if not model or not model.Parent or not data.Enabled then
+            conn:Disconnect()
+            if line then line.Visible = false line:Remove() end
+            if billboard then billboard:Destroy() end
+            data.Line = nil
+            data.Gui = nil
+            return
+        end
 
-		local char = LocalPlayer.Character
-		local plrHRP = char and char:FindFirstChild("HumanoidRootPart")
-		if not plrHRP then return end
+        local char = LocalPlayer.Character
+        local plrHRP = char and char:FindFirstChild("HumanoidRootPart")
+        if not plrHRP then return end
 
-		local npcPos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
-		local playerPos, playerOn = Camera:WorldToViewportPoint(plrHRP.Position)
+        local npcPos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+        local playerPos, playerOn = Camera:WorldToViewportPoint(plrHRP.Position)
 
-		if onScreen then
-			billboard.Enabled = true
-			nameText.Text = model.Name
-			nameText.TextColor3 = getRainbowColor()
+        if onScreen then
+            billboard.Enabled = true
+            nameText.Text = model.Name
+            nameText.TextColor3 = getRainbowColor()
 
-			local dist = (plrHRP.Position - hrp.Position).Magnitude
-			distText.Text = string.format("%.0f Studs", dist)
+            local dist = (plrHRP.Position - hrp.Position).Magnitude
+            distText.Text = string.format("%.0f Studs", dist)
 
-			line.From = playerOn and Vector2.new(playerPos.X, playerPos.Y) or Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
-			line.To = Vector2.new(npcPos.X, npcPos.Y)
-			line.Color = getRainbowColor()
-			line.Visible = true
-		else
-			billboard.Enabled = false
-			line.Visible = false
-		end
-	end)
+            line.From = playerOn and Vector2.new(playerPos.X, playerPos.Y) or Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
+            line.To = Vector2.new(npcPos.X, npcPos.Y)
+            line.Color = getRainbowColor()
+            line.Visible = true
+        else
+            billboard.Enabled = false
+            line.Visible = false
+        end
+    end)
 end
 
 local function createToggle(name, model)
-	if espTargets[name] then return end
+    if espTargets[name] then return end
 
-	local data = {Enabled = false, Model = model, Line = nil, Gui = nil}
-	espTargets[name] = data
+    local data = {Enabled = false, Model = model, Line = nil, Gui = nil}
+    espTargets[name] = data
 
-	local button = Instance.new("TextButton", scroll)
-	button.Size = UDim2.new(1, -10, 0, 30)
-	button.Text = "[OFF] " .. name
-	button.TextColor3 = Color3.new(1,1,1)
-	button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	button.Font = Enum.Font.GothamBold
-	button.TextSize = 13
-	button.TextXAlignment = Enum.TextXAlignment.Left
-	Instance.new("UICorner", button)
+    local button = Instance.new("TextButton", scroll)
+    button.Size = UDim2.new(1, -10, 0, 30)
+    button.Text = "[OFF] " .. name
+    button.TextColor3 = Color3.new(1,1,1)
+    button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 13
+    button.TextXAlignment = Enum.TextXAlignment.Left
+    Instance.new("UICorner", button)
 
-	button.MouseButton1Click:Connect(function()
-		data.Enabled = not data.Enabled
-		button.Text = (data.Enabled and "[ON] " or "[OFF] ") .. name
-		if data.Enabled then
-			createESP(model, data)
-		else
-			if data.Gui then data.Gui:Destroy() end
-			if data.Line then data.Line.Visible = false data.Line:Remove() end
-			data.Gui = nil
-			data.Line = nil
-		end
-	end)
+    button.MouseButton1Click:Connect(function()
+        data.Enabled = not data.Enabled
+        button.Text = (data.Enabled and "[ON] " or "[OFF] ") .. name
+        if data.Enabled then
+            createESP(model, data)
+        else
+            if data.Gui then data.Gui:Destroy() end
+            if data.Line then data.Line.Visible = false data.Line:Remove() end
+            data.Gui = nil
+            data.Line = nil
+        end
+    end)
 end
 
--- Quét tự động mọi NPC (Humanoid/Animator/Zombie...)
+-- Auto scan full NPC system:
 local function scanNPCs()
-	for _, npc in pairs(workspace:GetDescendants()) do
-		if npc:IsA("Model") then
-			local root = npc:FindFirstChild("HumanoidRootPart") or npc:FindFirstChild("Torso") or npc:FindFirstChild("UpperTorso") or npc:FindFirstChildWhichIsA("BasePart")
-			local isNPC = npc:FindFirstChildOfClass("Humanoid") or npc:FindFirstChildOfClass("Animator")
-				or npc:FindFirstChildOfClass("AnimationController") or npc:FindFirstChildWhichIsA("Script")
-
-			if root and isNPC and not espTargets[npc.Name] then
-				createToggle(npc.Name, npc)
-			end
-		end
-	end
+    for _, npc in pairs(workspace:GetDescendants()) do
+        if npc:IsA("Model") then
+            local root = npc:FindFirstChild("HumanoidRootPart") or npc:FindFirstChild("Torso") or npc:FindFirstChild("UpperTorso") or npc:FindFirstChildWhichIsA("BasePart")
+            local isNPC = npc:FindFirstChildOfClass("Humanoid") 
+                or npc:FindFirstChildOfClass("Animator") 
+                or npc:FindFirstChildOfClass("AnimationController") 
+                or npc:FindFirstChildWhichIsA("Script")
+            if root and isNPC and not espTargets[npc.Name] then
+                createToggle(npc.Name, npc)
+            end
+        end
+    end
 end
 
--- Tự động quét mỗi vài giây
 task.spawn(function()
-	while true do
-		pcall(scanNPCs)
-		task.wait(3)
-	end
+    while true do
+        pcall(scanNPCs)
+        task.wait(2)
+    end
 end)
